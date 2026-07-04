@@ -20,6 +20,7 @@ riskfolio/version.py
 demo.py
 portfolio_pie.png
 portfolio_dendrogram.png
+backtest_performance.png
 cached_prices/
 *.so
 *.dylib
