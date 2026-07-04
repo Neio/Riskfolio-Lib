@@ -12,9 +12,20 @@ TIINGO_API_KEY = os.environ.get("TIINGO_API_KEY")
 # 1. Define the tickers and configuration
 tickers = ['TSLA', 'NVDA', 'PANW', 'MU', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
 
-# Set this to True to query Yahoo Finance for the latest stock prices.
+# Set this to True to query Yahoo Finance/Tiingo for the latest stock prices.
 # Set to False to run completely offline/strictly using cached data.
-ONLINE_MODE = True
+ONLINE_MODE = False
+
+# Define your current portfolio holdings (number of shares you currently own).
+# If a ticker is not listed here, it is assumed you own 0 shares.
+CURRENT_HOLDINGS = {
+    'TSLA': 5,
+    'NVDA': 10,
+    'AMZN': 20,
+}
+
+# Define the new cash you want to add to the portfolio (can be 0.0)
+NEW_CASH = 10000.0
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 cache_dir = os.path.join(script_dir, "cached_prices")
@@ -196,22 +207,55 @@ ax_dendro.figure.savefig(dendro_output, bbox_inches='tight')
 plt.close(ax_dendro.figure)
 print(f"Dendrogram saved to: {dendro_output}")
 
-# 7. Convert Weights to Actual Share Allocations
-print("\n--- Converting Portfolio Weights to Share Allocations ---")
-budget = 100000.0  # Change this to your desired investing budget (in USD)
-print(f"Investing Budget: ${budget:,.2f}")
+# 7. Convert Weights to Actual Share Allocations and Rebalancing Orders
+print("\n--- Portfolio Rebalancing Calculations ---")
+
+# Ensure all tickers are in CURRENT_HOLDINGS (default to 0)
+current_shares = pd.Series(0.0, index=weights.index)
+for ticker, shares in CURRENT_HOLDINGS.items():
+    if ticker in current_shares.index:
+        current_shares[ticker] = shares
 
 # Get the latest price of each stock from the dataset
 latest_prices = prices_df.iloc[-1]
 
+# Calculate current value of holdings
+current_values = current_shares * latest_prices
+total_current_value = current_values.sum()
+total_portfolio_value = total_current_value + NEW_CASH
+
+print(f"Current Portfolio Value: ${total_current_value:,.2f}")
+print(f"New Cash to Invest:     ${NEW_CASH:,.2f}")
+print(f"Total Target Value:      ${total_portfolio_value:,.2f}")
+
 allocation_df = pd.DataFrame(index=weights.index)
 allocation_df['Weight (%)'] = (weights['weights'] * 100).round(2)
 allocation_df['Latest Price ($)'] = latest_prices.round(2)
-allocation_df['Allocation ($)'] = (weights['weights'] * budget).round(2)
-allocation_df['Shares to Buy'] = (allocation_df['Allocation ($)'] / allocation_df['Latest Price ($)']).round(2)
+allocation_df['Current Shares'] = current_shares
+allocation_df['Current Value ($)'] = current_values.round(2)
+allocation_df['Target Value ($)'] = (weights['weights'] * total_portfolio_value).round(2)
 
-print("\nAsset Purchase Breakdown:")
-print("-------------------------")
-print(allocation_df)
+# Calculate trade amount
+allocation_df['Trade Value ($)'] = (allocation_df['Target Value ($)'] - allocation_df['Current Value ($)']).round(2)
+allocation_df['Trade Shares'] = (allocation_df['Trade Value ($)'] / allocation_df['Latest Price ($)']).round(2)
+
+# Set Action (BUY, SELL, HOLD)
+def get_action(val):
+    if val > 0.01:
+        return 'BUY'
+    elif val < -0.01:
+        return 'SELL'
+    else:
+        return 'HOLD'
+
+allocation_df['Action'] = allocation_df['Trade Value ($)'].apply(get_action)
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)
+
+print("\nAsset Purchase & Rebalancing Breakdown:")
+print("---------------------------------------")
+# Reorder columns for readability
+print(allocation_df[['Weight (%)', 'Latest Price ($)', 'Current Shares', 'Current Value ($)', 'Target Value ($)', 'Action', 'Trade Shares', 'Trade Value ($)']])
 
 print("\nAll tasks completed successfully!")
