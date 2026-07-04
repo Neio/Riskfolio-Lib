@@ -16,3 +16,10 @@ __pycache__/
 /docs/.DS_Store
 /vscode
 riskfolio/version.py
+.venv/
+demo.py
+portfolio_pie.png
+portfolio_dendrogram.png
+cached_prices/
+*.so
+*.dylib
