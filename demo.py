@@ -6,11 +6,11 @@ import riskfolio as rp
 import matplotlib.pyplot as plt
 
 # 1. Define the tickers and configuration
-tickers = ['AMZN', 'JPM', 'TGT', 'CMCSA', 'JCI']
+tickers = ['TSLA', 'NVDA', 'PANW', 'MU', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
 
 # Set this to True to query Yahoo Finance for the latest stock prices.
 # Set to False to run completely offline/strictly using cached data.
-ONLINE_MODE = False
+ONLINE_MODE = True
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 cache_dir = os.path.join(script_dir, "cached_prices")
@@ -104,6 +104,13 @@ if tickers_to_download:
 final_prices = {ticker: prices_dict[ticker].iloc[:, 0] for ticker in tickers if ticker in prices_dict}
 prices_df = pd.DataFrame(final_prices).dropna()
 print(f"\nAligned stock prices for tickers: {list(prices_df.columns)}")
+
+if len(prices_df.columns) < 2:
+    print("\nError: At least 2 assets are required to run portfolio optimization and hierarchical clustering.")
+    print("Since the Yahoo Finance bulk download failed (due to API rate-limiting) and there is no cached data")
+    print("available for the other new assets, we cannot proceed.")
+    print("\nPlease wait a few minutes for the rate limit to expire, then run the script again to fetch and cache the data.")
+    exit(1)
 
 # Calculate returns
 returns = prices_df.pct_change().dropna()
