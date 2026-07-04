@@ -17,12 +17,6 @@ __pycache__/
 /vscode
 riskfolio/version.py
 .venv/
-demo.py
-portfolio_pie.png
-portfolio_dendrogram.png
-backtest_performance.png
-dca_performance.png
-mixed_dca_performance.png
 cached_prices/
 *.so
 *.dylib
