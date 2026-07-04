@@ -24,8 +24,8 @@ def run_mixed_backtest():
     # Define mixed universe:
     # 1 Superstar: NVDA
     # 3 Normals: PG (Procter & Gamble), KO (Coca-Cola), WMT (Walmart)
-    # 4 Underperformers: INTC (Intel), PFE (Pfizer), WBA (Walgreens), PYPL (PayPal)
-    stock_tickers = ['NVDA', 'PG', 'KO', 'WMT', 'INTC', 'PFE', 'WBA', 'PYPL']
+    # 3 Underperformers: INTC (Intel), PFE (Pfizer), PYPL (PayPal)
+    stock_tickers = ['NVDA', 'PG', 'KO', 'WMT', 'INTC', 'PFE', 'PYPL']
     all_tickers = stock_tickers + ['QQQ']
     
     prices_dict = {}
@@ -269,16 +269,22 @@ def run_mixed_backtest():
     print("-----------------------------------------------------------------")
     print(avg_weights.sort_values(ascending=False))
     
-    # 5. Plot Performance
+    # 5. Plot Performance (Normalized as % ROI)
     plt.figure(figsize=(12, 6))
-    plt.plot(results_df.index, results_df['Optimized Portfolio (Sharpe)'], label='Optimized Portfolio (Sharpe)', color='blue', linewidth=2.5)
-    plt.plot(results_df.index, results_df['Equal-Weighted Portfolio (1/N)'], label='Equal-Weighted Portfolio (1/N)', color='orange', linewidth=2)
-    plt.plot(results_df.index, results_df['QQQ Benchmark (ETF)'], label='QQQ Benchmark (ETF)', color='green', linewidth=1.5, linestyle='-.')
-    plt.plot(results_df.index, results_df['Cash Savings (Principal)'], label='Cash Savings (Total Principal)', color='gray', linewidth=1.5, linestyle='--')
     
-    plt.title('Monthly DCA Simulation ($2,000/Month): Mixed Universe Performance', fontsize=14, fontweight='bold')
+    # Calculate % Return on Invested Capital (ROI)
+    roi_opt = (results_df['Optimized Portfolio (Sharpe)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
+    roi_eq = (results_df['Equal-Weighted Portfolio (1/N)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
+    roi_qqq = (results_df['QQQ Benchmark (ETF)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
+    
+    plt.plot(results_df.index, roi_opt, label='Optimized Portfolio (Sharpe)', color='blue', linewidth=2.5)
+    plt.plot(results_df.index, roi_eq, label='Equal-Weighted Portfolio (1/N)', color='orange', linewidth=2)
+    plt.plot(results_df.index, roi_qqq, label='QQQ Benchmark (ETF)', color='green', linewidth=1.5, linestyle='-.')
+    plt.axhline(0, label='Cash Savings (0% Return)', color='gray', linewidth=1.5, linestyle='--')
+    
+    plt.title('Monthly DCA Simulation ($2,000/Month): Mixed Universe % ROI Comparison', fontsize=14, fontweight='bold')
     plt.xlabel('Date', fontsize=12)
-    plt.ylabel('Portfolio Value ($)', fontsize=12)
+    plt.ylabel('Return on Invested Capital (%)', fontsize=12)
     plt.legend(fontsize=10)
     plt.grid(linestyle=':', alpha=0.6)
     
