@@ -2,35 +2,11 @@
 
 **Portfolio Optimization in Python, Easy for Everyone.**
 
-<a href="https://www.kqzyfj.com/click-101360347-15150084?url=https%3A%2F%2Flink.springer.com%2Fbook%2F9783031843037" target="_blank">
-<div>
-<img src="https://raw.githubusercontent.com/dcajasn/Riskfolio-Lib/refs/heads/master/docs/source/_static/Button.png" height="40" />
-</div>
-</a>
-<a href="https://www.paypal.com/ncp/payment/GN55W4UQ7VAMN" target="_blank">
-<div>
-<img src="https://raw.githubusercontent.com/dcajasn/Riskfolio-Lib/refs/heads/master/docs/source/_static/Button2.png" height="40" />
-</div>
-<br>
-</a>
-
 <div class="row">
 <img src="https://raw.githubusercontent.com/dcajasn/Riskfolio-Lib/master/docs/source/images/MSV_Frontier.png" height="200">
 <img src="https://raw.githubusercontent.com/dcajasn/Riskfolio-Lib/master/docs/source/images/Pie_Chart.png" height="200">
 </div>
 <br>
-<a href="https://github.com/sponsors/dcajasn"> <img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" height="30" /></a>
-<br>
-<a href='https://ko-fi.com/B0B833SXD' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-<a href="https://github.com/dcajasn/Riskfolio-Lib/stargazers"> <img src="https://img.shields.io/github/stars/dcajasn/Riskfolio-Lib" height="28" /></a>
-<a href="https://pepy.tech/projects/riskfolio-lib"> <img src="https://static.pepy.tech/personalized-badge/riskfolio-lib?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BRIGHTGREEN&left_text=downloads" height="28" /></a>
-<a href="https://pepy.tech/projects/riskfolio-lib"> <img src="https://static.pepy.tech/personalized-badge/riskfolio-lib?period=monthly&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=ORANGE&left_text=downloads%2Fmonth" height="28" /></a>
-<a href="https://riskfolio-lib.readthedocs.io/en/latest/?badge=latest"> <img src="https://readthedocs.org/projects/riskfolio-lib/badge/?version=latest" height="28" /></a>
-<a href="https://github.com/dcajasn/Riskfolio-Lib/blob/master/LICENSE.txt"> <img src="https://img.shields.io/github/license/dcajasn/Riskfolio-Lib" height="28" /></a>
-<a href="https://mybinder.org/v2/gh/dcajasn/Riskfolio-Lib/HEAD"> <img src="https://mybinder.org/badge_logo.svg" height="28" /></a>
-
-[![Star History Chart](https://api.star-history.com/svg?repos=dcajasn/Riskfolio-Lib&type=timeline&legend=top-left)](https://www.star-history.com/#dcajasn/Riskfolio-Lib&type=timeline&legend=top-left)
 
 ## Description
 
@@ -340,17 +316,6 @@ For more examples, including Risk Parity and Hierarchical Clustering portfolios,
 Contributions of all kinds are welcome and greatly appreciated. Riskfolio-Lib is an 
 independent open-source project, and community support plays a vital role in its 
 continued development, maintenance, and growth.
-
-### Financial Support
-
-If you would like to support the long-term sustainability of Riskfolio-Lib, you can 
-contribute financially in any of the following ways:
-
-- Purchase my book [Advanced Portfolio Optimization: a Cutting-Edge Quantitative Approach](https://www.kqzyfj.com/click-101359873-15150084?url=https%3A%2F%2Flink.springer.com%2Fbook%2F9783031843037).
-- Enroll in my course [Portfolio Optimization with Python](https://www.paypal.com/ncp/payment/GN55W4UQ7VAMN).
-- Become a sponsor through [GitHub Sponsors](https://github.com/sponsors/dcajasn).
-- Make a donation via [Ko-fi](https://ko-fi.com/B0B833SXD).
-- Hire me for consulting services through my [LinkedIn](https://www.linkedin.com/in/dany-cajas/) or contact me by [Email](mailto:dcajasn@gmail.com).
 
 ### Other Ways to Contribute
 
