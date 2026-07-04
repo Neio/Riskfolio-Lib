@@ -40,7 +40,7 @@ today = datetime.datetime.now().date()
 end_date = datetime.datetime.now().strftime('%Y-%m-%d')
 default_start_date = (datetime.datetime.now() - datetime.timedelta(days=3*365)).strftime('%Y-%m-%d')
 
-fallback_source = os.path.join(script_dir, "tests", "stock_prices.csv")
+fallback_source = os.path.join(script_dir, "..", "tests", "stock_prices.csv")
 fallback_df = None
 if os.path.exists(fallback_source):
     fallback_df = pd.read_csv(fallback_source, parse_dates=True, index_col=0)
