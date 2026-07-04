@@ -164,7 +164,11 @@ def run_mixed_backtest():
     eq_holdings = pd.Series(0.0, index=stock_tickers)
     
     qqq_holdings = 0.0
-    cash_holdings = 0.0
+    cash_holdings = 0.0  # Cash total dollars (compounds at 4% daily risk-free rate)
+    principal_invested = 0.0  # Raw cash principal invested (0% interest baseline)
+    
+    # Lists to track history
+    principal_value = []
     
     # To track what the average weight allocation was for each asset during optimization
     weight_tracker = pd.DataFrame(0.0, index=returns_df.index[start_idx:], columns=stock_tickers)
@@ -181,11 +185,13 @@ def run_mixed_backtest():
         opt_holdings = opt_holdings * (1.0 + daily_ret)
         eq_holdings = eq_holdings * (1.0 + daily_ret)
         qqq_holdings = qqq_holdings * (1.0 + qqq_daily_ret)
+        cash_holdings = cash_holdings * (1.0 + 0.04 / 252)  # compounds at 4% annualized
         
         # Rebalance day
         if (i - start_idx) % rebalance_freq == 0:
             cash_holdings += dca_amount
             qqq_holdings += dca_amount
+            principal_invested += dca_amount
             
             opt_total_before = opt_holdings.sum() + dca_amount
             eq_total_before = eq_holdings.sum() + dca_amount
@@ -225,6 +231,7 @@ def run_mixed_backtest():
         eq_value.append(eq_holdings.sum())
         qqq_value.append(qqq_holdings)
         cash_value.append(cash_holdings)
+        principal_value.append(principal_invested)
         
     # Results DataFrame
     backtest_dates = returns_df.index[start_idx:]
@@ -232,7 +239,8 @@ def run_mixed_backtest():
     results_df['Optimized Portfolio (Sharpe)'] = opt_value
     results_df['Equal-Weighted Portfolio (1/N)'] = eq_value
     results_df['QQQ Benchmark (ETF)'] = qqq_value
-    results_df['Cash Savings (Principal)'] = cash_value
+    results_df['Cash Savings (4% Yield)'] = cash_value
+    results_df['Cash Savings (Principal)'] = principal_value
     
     # 4. Summary Performance Metrics
     metrics = {}
@@ -272,15 +280,17 @@ def run_mixed_backtest():
     # 5. Plot Performance (Normalized as % ROI)
     plt.figure(figsize=(12, 6))
     
-    # Calculate % Return on Invested Capital (ROI)
+    # Calculate % Return on Invested Capital (ROI) relative to raw cash principal
     roi_opt = (results_df['Optimized Portfolio (Sharpe)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
     roi_eq = (results_df['Equal-Weighted Portfolio (1/N)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
     roi_qqq = (results_df['QQQ Benchmark (ETF)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
+    roi_cash = (results_df['Cash Savings (4% Yield)'] - results_df['Cash Savings (Principal)']) / results_df['Cash Savings (Principal)'] * 100
     
     plt.plot(results_df.index, roi_opt, label='Optimized Portfolio (Sharpe)', color='blue', linewidth=2.5)
     plt.plot(results_df.index, roi_eq, label='Equal-Weighted Portfolio (1/N)', color='orange', linewidth=2)
     plt.plot(results_df.index, roi_qqq, label='QQQ Benchmark (ETF)', color='green', linewidth=1.5, linestyle='-.')
-    plt.axhline(0, label='Cash Savings (0% Return)', color='gray', linewidth=1.5, linestyle='--')
+    plt.plot(results_df.index, roi_cash, label='Cash Savings (4% Yield)', color='purple', linewidth=1.5, linestyle=':')
+    plt.axhline(0, label='Cash Principal (0% Return Baseline)', color='gray', linewidth=1.5, linestyle='--')
     
     plt.title('Monthly DCA Simulation ($2,000/Month): Mixed Universe % ROI Comparison', fontsize=14, fontweight='bold')
     plt.xlabel('Date', fontsize=12)
