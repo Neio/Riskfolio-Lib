@@ -4,6 +4,10 @@ import pandas as pd
 import yfinance as yf
 import riskfolio as rp
 import matplotlib.pyplot as plt
+import dotenv
+
+dotenv.load_dotenv()
+TIINGO_API_KEY = os.environ.get("TIINGO_API_KEY")
 
 # 1. Define the tickers and configuration
 tickers = ['TSLA', 'NVDA', 'PANW', 'MU', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
@@ -66,12 +70,16 @@ for ticker in tickers:
 if tickers_to_download:
     min_start_date = min(start_dates)
     print(f"\nRequesting updates in a single bulk API call starting from {min_start_date}...")
+    
+    download_success = False
+    
     try:
         import requests
         session = requests.Session()
         data = yf.download(tickers_to_download, start=min_start_date, end=end_date, session=session)
         
-        if not data.empty:
+        # Check if yfinance returned data for all requested tickers
+        if not data.empty and all(t in data.columns.get_level_values(-1) if isinstance(data.columns, pd.MultiIndex) else t in data.columns for t in tickers_to_download):
             for ticker in tickers_to_download:
                 ticker_file = os.path.join(cache_dir, f"{ticker}.csv")
                 if len(tickers_to_download) == 1:
@@ -94,11 +102,56 @@ if tickers_to_download:
                     
                 combined_df.to_csv(ticker_file)
                 prices_dict[ticker] = combined_df
-                print(f"-> Updated cache file for {ticker}")
+                print(f"-> Updated cache file for {ticker} via yfinance")
+            download_success = True
         else:
-            print("Bulk download returned empty data. Using cached data.")
+            print("yfinance bulk download returned incomplete data.")
     except Exception as e:
-        print(f"\nWarning: Bulk update failed: {e}. Falling back to cached data.")
+        print(f"yfinance bulk update failed: {e}")
+        
+    if not download_success:
+        if TIINGO_API_KEY:
+            print("\nAttempting fallback to Tiingo API...")
+            import requests
+            
+            for ticker, t_start in zip(tickers_to_download, start_dates):
+                ticker_file = os.path.join(cache_dir, f"{ticker}.csv")
+                print(f"Downloading {ticker} from Tiingo API starting from {t_start}...")
+                
+                url = f"https://api.tiingo.com/tiingo/daily/{ticker}/prices?startDate={t_start}&endDate={end_date}&token={TIINGO_API_KEY}"
+                try:
+                    response = requests.get(url, headers={'Content-Type': 'application/json'})
+                    if response.status_code == 200:
+                        json_data = response.json()
+                        if json_data:
+                            df_tiingo = pd.DataFrame(json_data)
+                            df_tiingo['date'] = pd.to_datetime(df_tiingo['date'])
+                            df_tiingo.set_index('date', inplace=True)
+                            
+                            col = 'adjClose' if 'adjClose' in df_tiingo.columns else 'close'
+                            series = df_tiingo[col]
+                            series.name = ticker
+                            
+                            new_df = series.to_frame()
+                            new_df.index = pd.to_datetime(new_df.index)
+                            
+                            if ticker in prices_dict:
+                                combined_df = pd.concat([prices_dict[ticker], new_df])
+                                combined_df = combined_df[~combined_df.index.duplicated(keep='last')].sort_index()
+                            else:
+                                combined_df = new_df
+                                
+                            combined_df.to_csv(ticker_file)
+                            prices_dict[ticker] = combined_df
+                            print(f"-> Successfully updated cache file for {ticker} via Tiingo")
+                        else:
+                            print(f"No data returned by Tiingo for {ticker}")
+                    else:
+                        print(f"Tiingo API request failed for {ticker} (status code: {response.status_code})")
+                except Exception as ex:
+                    print(f"Tiingo download failed for {ticker}: {ex}")
+        else:
+            print("\nWarning: yfinance failed and no TIINGO_API_KEY was found in environment or .env file.")
 
 # 4. Consolidate DataFrames
 final_prices = {ticker: prices_dict[ticker].iloc[:, 0] for ticker in tickers if ticker in prices_dict}
