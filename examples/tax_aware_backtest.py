@@ -73,6 +73,7 @@ def run_tax_aware_backtest():
     tax_free_holdings = pd.Series(0.0, index=stock_tickers)
     cash_holdings = 0.0
     principal_invested = 0.0
+    principal_value = []
     
     total_tax_paid_std = 0.0
     
@@ -253,6 +254,7 @@ def run_tax_aware_backtest():
         # Tax-Free and Cash Savings Value
         tax_free_value.append(tax_free_holdings.sum())
         cash_savings_value.append(cash_holdings)
+        principal_value.append(principal_invested)
         
     # Generate Results DataFrame
     backtest_dates = returns_df.index[start_idx:]
@@ -261,7 +263,7 @@ def run_tax_aware_backtest():
     results_df['Optimized Portfolio (Taxable Std - 55.2% STCG)'] = taxable_std_value
     results_df['Optimized Portfolio (Taxable Buy-Only)'] = taxable_buy_only_value
     results_df['Cash Savings (4% Yield)'] = cash_savings_value
-    results_df['Cash Savings (Principal)'] = [principal_invested] * len(backtest_dates)
+    results_df['Cash Savings (Principal)'] = principal_value
     
     # Calculate performance metrics
     metrics = {}
