@@ -298,6 +298,43 @@ The latest stable release (and older versions) can be installed from PyPI:
     pip install riskfolio-lib
 
 
+## Quick Start
+
+Here is a simple example of how to optimize a portfolio for the **Maximum Sharpe Ratio** using historical stock prices downloaded via `yfinance`:
+
+```python
+import yfinance as yf
+import riskfolio as rp
+
+# 1. Download stock prices and calculate returns
+tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA']
+data = yf.download(tickers, start="2022-01-01", end="2025-01-01")
+prices = data['Adj Close'] if 'Adj Close' in data.columns else data['Close']
+returns = prices.pct_change().dropna()
+
+# 2. Initialize the Portfolio object
+port = rp.Portfolio(returns=returns)
+
+# 3. Estimate expected returns (mu) and covariance matrix (cov)
+port.assets_stats(method_mu='hist', method_cov='hist')
+
+# 4. Configure optimization parameters
+port.solvers = ['CLARABEL', 'SCS']
+weights = port.optimization(
+    model='Classic', # Classic Mean-Variance / Mean-Risk optimization
+    rm='MV',         # Risk measure: Mean-Variance
+    obj='Sharpe',    # Objective: Maximize Sharpe Ratio
+    rf=0.0,          # Risk-free rate
+    hist=True        # Use historical scenarios
+)
+
+# 5. Display optimal allocations
+print(weights * 100)
+```
+
+For more examples, including Risk Parity and Hierarchical Clustering portfolios, check out the [ReadTheDocs Tutorials](https://riskfolio-lib.readthedocs.io/en/latest/examples.html).
+
+
 ## Contributing
 
 Contributions of all kinds are welcome and greatly appreciated. Riskfolio-Lib is an 
