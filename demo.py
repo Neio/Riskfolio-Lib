@@ -136,4 +136,22 @@ ax_dendro.figure.savefig(dendro_output, bbox_inches='tight')
 plt.close(ax_dendro.figure)
 print(f"Dendrogram saved to: {dendro_output}")
 
+# 7. Convert Weights to Actual Share Allocations
+print("\n--- Converting Portfolio Weights to Share Allocations ---")
+budget = 100000.0  # Change this to your desired investing budget (in USD)
+print(f"Investing Budget: ${budget:,.2f}")
+
+# Get the latest price of each stock from the dataset
+latest_prices = prices_df.iloc[-1]
+
+allocation_df = pd.DataFrame(index=weights.index)
+allocation_df['Weight (%)'] = (weights['weights'] * 100).round(2)
+allocation_df['Latest Price ($)'] = latest_prices.round(2)
+allocation_df['Allocation ($)'] = (weights['weights'] * budget).round(2)
+allocation_df['Shares to Buy'] = (allocation_df['Allocation ($)'] / allocation_df['Latest Price ($)']).round(2)
+
+print("\nAsset Purchase Breakdown:")
+print("-------------------------")
+print(allocation_df)
+
 print("\nAll tasks completed successfully!")
