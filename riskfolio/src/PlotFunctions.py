@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.lines as mlines
 import matplotlib.ticker as mticker
-from matplotlib import cm, colors
+from matplotlib import cm, colors, colormaps
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 import scipy.stats as st
 import scipy.cluster.hierarchy as hr
@@ -190,7 +190,7 @@ def plot_series(returns, w, cmap="tab20", n_colors=20, height=6, width=10, ax=No
     labels = w_.columns.tolist()
     index = returns.index.tolist()
 
-    colormap = cm.get_cmap(cmap)
+    colormap = colormaps[cmap]
     colormap = colormap(np.linspace(0, 1, int(n_colors)))
 
     if cmap == "gist_rainbow":
@@ -603,7 +603,7 @@ def plot_frontier(
             colormap = np.array(colormap)
 
         if len(label) != colormap.shape[0]:
-            colormap = cm.get_cmap("tab20")
+            colormap = colormaps["tab20"]
             colormap = colormap(np.linspace(0, 1, 20))
             colormap = np.vstack(
                 [colormap[6:8], colormap[2:6], colormap[8:], colormap[0:2]]
@@ -797,7 +797,7 @@ def plot_pie(
 
     ax.set_title(title)
 
-    colormap = cm.get_cmap(cmap)
+    colormap = colormaps[cmap]
     colormap = colormap(np.linspace(0, 1, n_colors))
 
     if cmap == "gist_rainbow":
@@ -1195,7 +1195,7 @@ def plot_frontier_area(
 
     ax.set_title("Efficient Frontier's Assets Structure")
 
-    colormap = cm.get_cmap(cmap)
+    colormap = colormaps[cmap]
     colormap = colormap(np.linspace(0, 1, int(n_colors)))
 
     if cmap == "gist_rainbow":
