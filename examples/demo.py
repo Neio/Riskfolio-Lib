@@ -181,10 +181,13 @@ returns = prices_df.pct_change().dropna()
 
 # 5. Run Classic Mean-Variance Optimization
 print("\n--- Running Classic Mean-Variance Portfolio Optimization ---")
+# 4% annualized risk-free rate converted to daily frequency (252 trading days/year)
+daily_rf = 0.04 / 252
+
 port = rp.Portfolio(returns=returns)
 port.assets_stats(method_mu='hist', method_cov='hist')
 port.solvers = ['CLARABEL', 'SCS']
-weights = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=0.0, hist=True)
+weights = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=daily_rf, hist=True)
 
 print("\nOptimal Sharpe Allocation Weights:")
 print(weights.round(4) * 100)
@@ -199,7 +202,7 @@ print(f"Pie chart saved to: {pie_output}")
 # 6. Run Hierarchical Clustering (Dendrogram)
 print("\n--- Running Hierarchical Clustering Analysis ---")
 hc_port = rp.HCPortfolio(returns=returns)
-hc_port.optimization(model='HRP', codependence='pearson', rm='vol', rf=0.0, linkage='single')
+hc_port.optimization(model='HRP', codependence='pearson', rm='vol', rf=daily_rf, linkage='single')
 
 ax_dendro = rp.plot_dendrogram(returns, codependence='pearson', linkage='single', k=None, max_k=10, leaf_order=True, ax=None)
 dendro_output = os.path.join(script_dir, "portfolio_dendrogram.png")

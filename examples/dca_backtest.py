@@ -201,7 +201,7 @@ def run_dca_backtest():
                 port = rp.Portfolio(returns=lookback_data)
                 port.assets_stats(method_mu='hist', method_cov='hist')
                 port.solvers = ['CLARABEL', 'SCS']
-                w_opt = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=0.0, hist=True)
+                w_opt = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=0.04/252, hist=True)
                 opt_target_weights = w_opt['weights']
                 
                 # Target dollar allocations

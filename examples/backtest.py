@@ -85,7 +85,7 @@ def run_backtest():
                     port.assets_stats(method_mu='hist', method_cov='hist')
                     port.solvers = ['CLARABEL', 'SCS']
                     
-                    w_opt = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=0.0, hist=True)
+                    w_opt = port.optimization(model='Classic', rm='MV', obj='Sharpe', rf=0.04/252, hist=True)
                     new_weights = w_opt['weights'].values
                     
                     # Deduct transaction fee
