@@ -39,7 +39,7 @@ for ticker in tickers:
     
     if os.path.exists(ticker_file):
         df = pd.read_csv(ticker_file, parse_dates=True, index_col=0)
-        df.index = pd.to_datetime(df.index)
+        df.index = pd.to_datetime(df.index).tz_localize(None)
         prices_dict[ticker] = df
         
         last_date = df.index.max().date()
@@ -52,7 +52,7 @@ for ticker in tickers:
             print(f"Cache for {ticker} not found. Extracting from local fallback file: {fallback_source}")
             series = fallback_df[ticker]
             df = series.to_frame()
-            df.index = pd.to_datetime(df.index)
+            df.index = pd.to_datetime(df.index).tz_localize(None)
             df.to_csv(ticker_file)
             prices_dict[ticker] = df
             
@@ -92,7 +92,7 @@ if tickers_to_download:
                 
                 series.name = ticker
                 new_df = series.to_frame()
-                new_df.index = pd.to_datetime(new_df.index)
+                new_df.index = pd.to_datetime(new_df.index).tz_localize(None)
                 
                 if ticker in prices_dict:
                     combined_df = pd.concat([prices_dict[ticker], new_df])
@@ -125,7 +125,7 @@ if tickers_to_download:
                         json_data = response.json()
                         if json_data:
                             df_tiingo = pd.DataFrame(json_data)
-                            df_tiingo['date'] = pd.to_datetime(df_tiingo['date'])
+                            df_tiingo['date'] = pd.to_datetime(df_tiingo['date']).dt.tz_localize(None)
                             df_tiingo.set_index('date', inplace=True)
                             
                             col = 'adjClose' if 'adjClose' in df_tiingo.columns else 'close'
@@ -133,7 +133,7 @@ if tickers_to_download:
                             series.name = ticker
                             
                             new_df = series.to_frame()
-                            new_df.index = pd.to_datetime(new_df.index)
+                            new_df.index = pd.to_datetime(new_df.index).tz_localize(None)
                             
                             if ticker in prices_dict:
                                 combined_df = pd.concat([prices_dict[ticker], new_df])
